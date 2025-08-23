@@ -1,0 +1,43 @@
+schema episode_request {
+    document episode_request {
+        field episode_id type string {
+            indexing: summary | index
+        }
+        field title type string {
+            indexing: summary | index
+        }
+        field topic type string {
+            indexing: summary | index
+        }
+        field episode_type type string {
+            indexing: summary | index
+        }
+        field description type string {
+            indexing: summary | index
+        }
+        field raw_input type string {
+            indexing: summary
+        }
+        field keywords type array<string> {
+            indexing: summary | index
+        }
+        field target_audience type string {
+            indexing: summary
+        }
+        field target_word_count type int {
+            indexing: summary
+        }
+        field requested_date type long {
+            indexing: summary
+        }
+        field status type string {
+            indexing: summary | index
+        }
+        field ai_model_used type string {
+            indexing: summary
+        }
+        field priority type string {
+            indexing: summary | index
+        }
+    }
+}

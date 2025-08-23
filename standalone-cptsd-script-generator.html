@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPTSD Podcast Script Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #f3e8ff 0%, #dbeafe 100%);
+        }
+        
+        .section-card {
+            transition: all 0.3s ease;
+        }
+        
+        .section-card.generating {
+            background: #dbeafe !important;
+            border: 2px solid #3b82f6 !important;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+        
+        .section-card.completed {
+            background: #f0fdf4 !important;
+            border: 1px solid #bbf7d0 !important;
+        }
+        
+        .pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
+        }
+        
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .scale-click {
+            transform: scale(0.95);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 12px 20px;
+            border-radius: 6px;
+            color: white;
+            font-weight: 500;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: #059669;
+        }
+        
+        .notification.error {
+            background: #dc2626;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <div class="max-w-6xl mx-auto p-6">
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-6">
+            <div class="flex items-center gap-3 mb-6">
+                <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                </svg>
+                <h1 class="text-3xl font-bold text-gray-800">CPTSD Podcast Script Generator</h1>
+            </div>
+            
+            <div class="bg-yellow-100 rounded-lg p-4 mb-6">
+                <div class="flex items-start gap-3">
+                    <div class="flex-1">
+                        <h3 class="font-semibold text-yellow-800 mb-2">Offline Version</h3>
+                        <div class="space-y-3">
+                            <div class="pt-2">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                    <span class="text-yellow-700 font-medium">Manual Script Creation</span>
+                                </div>
+                                <p class="text-sm text-yellow-700">
+                                    This offline version provides the structure and templates for creating CPTSD podcast scripts. 
+                                    Use the section guides to write your content manually following Gregory's style and format.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6 mb-6">
+                <div class="bg-blue-50 rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h3 class="font-semibold text-blue-800">Episode Type</h3>
+                    </div>
+                    <select id="episodeType" class="w-full p-2 border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="main">Main Podcast</option>
+                        <option value="friday">Friday Healing</option>
+                    </select>
+                </div>
+
+                <div class="bg-green-50 rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h3 class="font-semibold text-green-800">Target Words</h3>
+                    </div>
+                    <p id="targetWords" class="text-2xl font-bold text-green-600">9,500</p>
+                </div>
+
+                <div class="bg-orange-50 rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        <h3 class="font-semibold text-orange-800">Sections</h3>
+                    </div>
+                    <p id="sectionCount" class="text-2xl font-bold text-orange-600">9</p>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">Script Structure</h3>
+                <div id="sectionsContainer" class="space-y-2">
+                    <!-- Sections will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Episode Input (paste your spreadsheet line or topic here):
+                </label>
+                <textarea id="episodeInput" 
+                    placeholder="Example: 8/07/2025 Main Podcast **Reconnecting with Joy: Rediscovering Happiness**"
+                    class="w-full h-32 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"></textarea>
+            </div>
+
+            <button id="generateBtn" 
+                class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-6 rounded-md transition-all transform hover:scale-102 active:scale-98 flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Create Manual Script Structure
+            </button>
+        </div>
+
+        <!-- Generated Content Area -->
+        <div id="generatedContent" class="space-y-6" style="display: none;">
+            <!-- Manual Script Structure -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">Manual Script Structure</h2>
+                    <div class="flex items-center gap-4">
+                        <span id="currentWordCount" class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">0 words</span>
+                    </div>
+                </div>
+                <div class="flex gap-2 mb-4">
+                    <button onclick="copyScript()" 
+                        class="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                        Copy All
+                    </button>
+                    <button onclick="downloadScript()" 
+                        class="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Download
+                    </button>
+                    <button onclick="emailScript()" 
+                        class="flex items-center gap-2 px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                        Email
+                    </button>
+                </div>
+                <div id="scriptTextareas" class="space-y-4">
+                    <!-- Script text areas will be generated here -->
+                </div>
+            </div>
+
+            <!-- Episode Details -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Episode Details</h2>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">SEO Episode Title (60-70 characters):</label>
+                        <input id="episodeTitle" type="text" 
+                            class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            placeholder="CPTSD: Topic Title - Key Benefit">
+                        <div class="mt-1">
+                            <span id="titleLength" class="text-sm text-gray-500">0 characters</span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">SEO Tags (20 tags, comma-separated):</label>
+                        <textarea id="episodeTags" 
+                            class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            placeholder="cptsd,trauma,healing,therapy,recovery,mental-health..."
+                            rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Episode Description:</label>
+                    <textarea id="episodeDescription" 
+                        class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        rows="12"
+                        placeholder="In this episode, [compelling intro with **key terms in bold**]..."></textarea>
+                    
+                    <div class="mt-2 flex gap-2">
+                        <button onclick="copyDescription()" 
+                            class="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                            Copy Description
+                        </button>
+                        <button onclick="loadDescriptionTemplate()" 
+                            class="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-all">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Load Template
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        const mainEpisodeSections = [
+            { name: 'Opening & Welcome', target: 500, description: 'Warm opening with episode preview' },
+            { name: 'Topic Introduction', target: 1000, description: 'Personal story and topic setup' },
+            { name: 'Deep Dive Part 1', target: 1200, description: 'Core concepts and experiences' },
+            { name: 'Research & Evidence', target: 1500, description: 'Studies, citations, and scientific backing' },
+            { name: 'Deep Dive Part 2', target: 1200, description: 'Advanced concepts and nuances' },
+            { name: 'Listener Stories', target: 1500, description: 'Community experiences and validation' },
+            { name: 'Practical Tools Part 1', target: 1000, description: 'Techniques and exercises' },
+            { name: 'Practical Tools Part 2', target: 1000, description: 'More tools and real-world application' },
+            { name: 'Integration & Wrap-up', target: 600, description: 'Bringing it all together and closing' }
+        ];
+
+        const fridayHealingSections = [
+            { name: 'Opening & Welcome', target: 400, description: 'Warm Friday healing opening' },
+            { name: 'Topic Exploration', target: 800, description: 'Core topic with personal stories' },
+            { name: 'Research & Evidence', target: 600, description: 'Supporting studies and citations' },
+            { name: 'Community Focus', target: 700, description: 'Listener stories and shared experiences' },
+            { name: 'Practical Tools', target: 400, description: 'Healing techniques and exercises' },
+            { name: 'Closing & Preview', target: 300, description: 'Gentle wrap-up and next episode preview' }
+        ];
+
+        let currentSections = mainEpisodeSections;
+
+        function getCurrentSections() {
+            const episodeType = document.getElementById('episodeType').value;
+            return episodeType === 'main' ? mainEpisodeSections : fridayHealingSections;
+        }
+
+        function updateStats() {
+            const sections = getCurrentSections();
+            const totalTarget = sections.reduce((sum, section) => sum + section.target, 0);
+            
+            document.getElementById('targetWords').textContent = totalTarget.toLocaleString();
+            document.getElementById('sectionCount').textContent = sections.length;
+        }
+
+        function renderSections() {
+            const container = document.getElementById('sectionsContainer');
+            const sections = getCurrentSections();
+            
+            container.innerHTML = '';
+            
+            sections.forEach((section, index) => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'section-card flex items-center justify-between p-3 rounded-lg bg-gray-50 border border-gray-200';
+                
+                sectionDiv.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center bg-purple-100">
+                            <span class="text-purple-600 font-medium text-sm">${index + 1}</span>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-800">${section.name}</h4>
+                            <p class="text-sm text-gray-600">${section.description}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-medium text-gray-800">${section.target} words</p>
+                    </div>
+                `;
+                
+                container.appendChild(sectionDiv);
+            });
+        }
+
+        function generateScriptStructure() {
+            const input = document.getElementById('episodeInput').value;
+            if (!input.trim()) {
+                showNotification('Please enter your episode topic/input first', 'error');
+                return;
+            }
+
+            const sections = getCurrentSections();
+            const scriptContainer = document.getElementById('scriptTextareas');
+            
+            scriptContainer.innerHTML = '';
+            
+            sections.forEach((section, index) => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'bg-gray-50 border border-gray-200 rounded-lg p-4';
+                
+                const guidance = getGuidanceForSection(section, index, sections.length);
+                
+                sectionDiv.innerHTML = `
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-lg font-semibold text-gray-800">${section.name}</h3>
+                        <div class="text-sm text-gray-600">
+                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                                Target: ${section.target} words
+                            </span>
+                            <span id="wordCount${index}" class="bg-gray-100 text-gray-700 px-2 py-1 rounded-full ml-2">
+                                0 words
+                            </span>
+                        </div>
+                    </div>
+                    <div class="bg-blue-50 border border-blue-200 rounded p-3 mb-3">
+                        <p class="text-sm text-blue-800 font-medium mb-1">Writing Guide:</p>
+                        <p class="text-sm text-blue-700">${guidance}</p>
+                    </div>
+                    <textarea id="section${index}" 
+                        class="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        rows="8"
+                        placeholder="Write your ${section.name.toLowerCase()} content here..."
+                        oninput="updateWordCount(${index})"></textarea>
+                `;
+                
+                scriptContainer.appendChild(sectionDiv);
+            });
+            
+            document.getElementById('generatedContent').style.display = 'block';
+            loadDescriptionTemplate();
+            showNotification('Script structure created! Start writing your sections.', 'success');
+        }
+
+        function getGuidanceForSection(section, index, totalSections) {
+            const guides = {
+                'Opening & Welcome': 'Start with Gregory\'s warm, authentic greeting. Introduce today\'s topic with a personal touch. Preview what listeners will discover without being too formal.',
+                
+                'Topic Introduction': 'Share a personal story or experience that connects to today\'s topic. Make it vulnerable and relatable. Set the emotional tone for the episode.',
+                
+                'Deep Dive Part 1': 'Explore the core concepts. Use Gregory\'s compassionate, validating voice. Break down complex ideas into digestible pieces. Include personal anecdotes.',
+                
+                'Research & Evidence': 'Reference studies, books, or expert opinions that support the topic. Cite sources naturally within conversation. Make science accessible and relevant.',
+                
+                'Deep Dive Part 2': 'Build on Part 1 with more advanced concepts. Address nuances and complexities. Continue with Gregory\'s empathetic, knowledgeable tone.',
+                
+                'Topic Exploration': 'For Friday Healing: Explore the topic through personal stories and gentle insights. Focus on hope and healing.',
+                
+                'Listener Stories': 'Share community experiences (anonymized). Validate shared struggles. Use these stories to illustrate points and build connection.',
+                
+                'Community Focus': 'Highlight shared experiences and community support. Emphasize that listeners aren\'t alone in their journey.',
+                
+                'Practical Tools': 'Provide concrete, actionable techniques. Explain how to implement them. Be specific and practical.',
+                
+                'Practical Tools Part 1': 'First set of practical techniques. Make them actionable and specific. Explain the "how" not just the "what".',
+                
+                'Practical Tools Part 2': 'Additional tools and real-world applications. Connect back to earlier concepts. Focus on implementation.',
+                
+                'Integration & Wrap-up': 'Bring all concepts together. End with hope and connection. Include the Supporters Club call-to-action.',
+                
+                'Closing & Preview': 'Gentle, hopeful closing for Friday Healing. Brief preview of next episode. Warm farewell.'
+            };
+            
+            return guides[section.name] || `Write content for ${section.name} following Gregory's compassionate, authentic style.`;
+        }
+
+        function updateWordCount(sectionIndex) {
+            const textarea = document.getElementById(`section${sectionIndex}`);
+            const text = textarea.value;
+            const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+            
+            document.getElementById(`wordCount${sectionIndex}`).textContent = `${wordCount} words`;
+            
+            // Update total word count
+            updateTotalWordCount();
+        }
+
+        function updateTotalWordCount() {
+            let totalWords = 0;
+            const sections = getCurrentSections();
+            
+            for (let i = 0; i < sections.length; i++) {
+                const textarea = document.getElementById(`section${i}`);
+                if (textarea) {
+                    const text = textarea.value;
+                    const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+                    totalWords += wordCount;
+                }
+            }
+            
+            document.getElementById('currentWordCount').textContent = `${totalWords.toLocaleString()} words`;
+        }
+
+        function getAllScriptContent() {
+            const sections = getCurrentSections();
+            let fullScript = '';
+            
+            for (let i = 0; i < sections.length; i++) {
+                const textarea = document.getElementById(`section${i}`);
+                if (textarea && textarea.value.trim()) {
+                    fullScript += textarea.value.trim() + '\n\n';
+                }
+            }
+            
+            return fullScript.trim();
+        }
+
+        function copyScript() {
+            const script = getAllScriptContent();
+            if (!script) {
+                showNotification('No script content to copy', 'error');
+                return;
+            }
+            
+            navigator.clipboard.writeText(script).then(() => {
+                showNotification('Script copied to clipboard!', 'success');
+            }).catch(() => {
+                showNotification('Failed to copy script', 'error');
+            });
+        }
+
+        function downloadScript() {
+            const script = getAllScriptContent();
+            if (!script) {
+                showNotification('No script content to download', 'error');
+                return;
+            }
+            
+            const blob = new Blob([script], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'cptsd-podcast-script.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Script downloaded!', 'success');
+        }
+
+        function emailScript() {
+            const script = getAllScriptContent();
+            const title = document.getElementById('episodeTitle').value || 'CPTSD Podcast Script';
+            const description = document.getElementById('episodeDescription').value;
+            const tags = document.getElementById('episodeTags').value;
+            
+            const emailBody = `CPTSD PODCAST SCRIPT
+
+TITLE: ${title}
+
+DESCRIPTION:
+${description}
+
+TAGS: ${tags}
+
+FULL SCRIPT:
+${script}
+
+Generated by CPTSD Podcast Script Generator`;
+            
+            const subject = `CPTSD Podcast Script: ${title}`;
+            const mailtoLink = `mailto:cptsd@senseofthisshit.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+            
+            window.open(mailtoLink, '_blank');
+            showNotification('Email opened in default mail client', 'success');
+        }
+
+        function copyDescription() {
+            const description = document.getElementById('episodeDescription').value;
+            if (!description) {
+                showNotification('No description to copy', 'error');
+                return;
+            }
+            
+            navigator.clipboard.writeText(description).then(() => {
+                showNotification('Description copied to clipboard!', 'success');
+            }).catch(() => {
+                showNotification('Failed to copy description', 'error');
+            });
+        }
+
+        function loadDescriptionTemplate() {
+            const template = `In this episode, [write an engaging 80-120 word introduction with **key terms in bold**]
+
+
+**Key Takeaways**
+
+• [takeaway 1]
+• [takeaway 2]
+• [takeaway 3]
+• [takeaway 4]
+• [takeaway 5]
+
+
+**What You'll Discover**
+
+• [discovery 1]
+• [discovery 2]
+• [discovery 3]
+• [discovery 4]
+• [discovery 5]
+
+
+**Resources Mentioned**
+
+• [book/study/resource 1]
+• [book/study/resource 2]
+• [book/study/resource 3]
+
+
+**Next Episode Preview**
+
+[1-2 sentences about next episode]
+
+
+📩 Have questions or want to share your experience? Reach out at cptsd@senseofthisshit.com.
+
+💛 **Join Our Supporters Club** 💛 Go ad-free and help keep these vital conversations alive—Click Here: https://www.spreaker.com/podcast/c-ptsd-let-s-make-sense-of-this-sh-t--6331440/support`;
+
+            document.getElementById('episodeDescription').value = template;
+            showNotification('Description template loaded!', 'success');
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.className = `notification ${type}`;
+            }, 3000);
+        }
+
+        // Event listeners
+        document.getElementById('episodeType').addEventListener('change', function() {
+            updateStats();
+            renderSections();
+        });
+
+        document.getElementById('generateBtn').addEventListener('click', generateScriptStructure);
+
+        document.getElementById('episodeTitle').addEventListener('input', function() {
+            const length = this.value.length;
+            document.getElementById('titleLength').textContent = `${length} characters`;
+            document.getElementById('titleLength').className = `text-sm ${
+                length >= 60 && length <= 70 ? 'text-green-600' : 'text-gray-500'
+            }`;
+        });
+
+        // Initialize
+        updateStats();
+        renderSections();
+    </script>
+</body>
+</html>

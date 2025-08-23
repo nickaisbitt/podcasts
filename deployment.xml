@@ -1,0 +1,8 @@
+<deployment version="1.0">
+  <instance id="default">
+    <prod>
+      <region>aws-us-east-1c</region>
+    </prod>
+  </instance>
+  <!-- instance name must match the instance part of tenant.application.instance (here: default) -->
+</deployment>

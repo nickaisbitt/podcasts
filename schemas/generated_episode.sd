@@ -1,0 +1,76 @@
+schema generated_episode {
+    document generated_episode {
+        field episode_id type string {
+            indexing: summary | index
+        }
+        field title type string {
+            indexing: summary | index
+        }
+        field seo_title type string {
+            indexing: summary | index
+        }
+        field content type string {
+            indexing: summary | index
+        }
+        field script type string {
+            indexing: summary
+        }
+        field episode_type type string {
+            indexing: summary | index
+        }
+        field sections_data type string {
+            indexing: summary
+        }
+        field topics type array<string> {
+            indexing: summary | index
+        }
+        field duration_minutes type int {
+            indexing: summary
+        }
+        field actual_word_count type int {
+            indexing: summary
+        }
+        field target_word_count type int {
+            indexing: summary
+        }
+        field generated_date type long {
+            indexing: summary
+        }
+        field source_request_id type string {
+            indexing: summary | index
+        }
+        field tags type array<string> {
+            indexing: summary | index
+        }
+        field seo_tags type string {
+            indexing: summary
+        }
+        field content_type type string {
+            indexing: summary | index
+        }
+        field episode_summary type string {
+            indexing: summary | index
+        }
+        field description_universal type string {
+            indexing: summary
+        }
+        field description_html type string {
+            indexing: summary
+        }
+        field publish_date_long type string {
+            indexing: summary
+        }
+        field publish_date_short type string {
+            indexing: summary
+        }
+        field ai_model_used type string {
+            indexing: summary
+        }
+        field generation_status type string {
+            indexing: summary | index
+        }
+        field quality_score type float {
+            indexing: summary
+        }
+    }
+}
