@@ -20,3 +20,7 @@ app.post("/test/generate-episode", async (req, res) => {
   const mockEpisode = { topic, episodeType, title: `CPTSD Recovery: ${topic}`, generatedAt: new Date().toISOString() };
   res.json({ success: true, data: mockEpisode });
 });
+
+app.get("/", (req, res) => {
+  res.json({ message: "CPTSD Podcast Generator", status: "healthy", endpoints: { health: "/health", generateEpisode: "POST /test/generate-episode" } });
+});
