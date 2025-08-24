@@ -10,7 +10,7 @@ const logger = require('./utils/logger');
 const errorHandler = require('./middleware/errorHandler');
 const scriptRoutes = require('./routes/scriptRoutes');
 const healthRoutes = require('./routes/healthRoutes');
-const SchedulerService = require('./services/schedulerService');
+// const SchedulerService = require('./services/schedulerService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -119,10 +119,10 @@ app.listen(PORT, "0.0.0.0", async () => {
   
   // Start the automatic episode scheduler
   try {
-    const scheduler = new SchedulerService();
+    // const scheduler = new SchedulerService();
     await scheduler.initialize();
-    scheduler.start();
-    logger.info('📅 Automatic episode scheduler started - will generate scripts for episodes within 2 months');
+    // scheduler.start();
+    logger.info('📅 Automatic episode // scheduler.started - will generate scripts for episodes within 2 months');
   // Railway fix: Add startup delay for health checks
   await new Promise(resolve => setTimeout(resolve, 3000));
   logger.info("��� Application startup complete - ready for health checks");
