@@ -14,3 +14,7 @@ app.get("/health", (req, res) => {
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+app.get("/", (req, res) => {
+  res.json({ message: "CPTSD Podcast Script Generator API", status: "healthy", version: "2.0.0" });
+});
